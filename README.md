@@ -1,16 +1,9 @@
-# new_year_2025
+# New Year Countdown
 
 A new Flutter project.
 
-## Getting Started
+## Screenshots
 
-This project is a starting point for a Flutter application.
+<img src="https://github.com/user-attachments/assets/978916e5-0283-4620-8692-9edf3b5f339f" alt="Simulator Screenshot" height="500">
 
-A few resources to get you started if this is your first Flutter project:
-
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
-
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+<img src="https://github.com/user-attachments/assets/0afa2b29-377c-4ae3-8eb6-cff8e9165392" alt="Simulator Screenshot" height="500">
