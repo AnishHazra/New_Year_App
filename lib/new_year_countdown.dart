@@ -13,19 +13,20 @@ class NewYearCountdown extends StatefulWidget {
 class _NewYearCountdownState extends State<NewYearCountdown> {
   late Timer _timer;
   late Duration _timeRemaining;
-  final DateTime _targetTime = DateTime(2025, 1, 1, 0, 0, 0);
+  DateTime? _targetTime;
 
   @override
   void initState() {
     super.initState();
-    _timeRemaining = _targetTime.difference(DateTime.now());
-    _startTimer();
+    _timeRemaining = Duration.zero;
   }
 
   void _startTimer() {
+    if (_targetTime == null) return;
+
     _timer = Timer.periodic(const Duration(seconds: 1), (_) {
       setState(() {
-        _timeRemaining = _targetTime.difference(DateTime.now());
+        _timeRemaining = _targetTime!.difference(DateTime.now());
         if (_timeRemaining <= Duration.zero) {
           _timer.cancel();
           _navigateToNextPage();
@@ -38,6 +39,40 @@ class _NewYearCountdownState extends State<NewYearCountdown> {
     Navigator.of(context).pushReplacement(
       MaterialPageRoute(builder: (_) => const CelebrationScreen()),
     );
+  }
+
+  void _pickDateTime() async {
+    DateTime now = DateTime.now();
+
+    //! Pick the date
+    final DateTime? pickedDate = await showDatePicker(
+      context: context,
+      initialDate: now,
+      firstDate: now,
+      lastDate: DateTime(now.year + 10),
+    );
+
+    if (pickedDate == null) return;
+
+    //! Pick the time
+    final TimeOfDay? pickedTime = await showTimePicker(
+      context: context,
+      initialTime: TimeOfDay.now(),
+    );
+
+    if (pickedTime == null) return;
+
+    setState(() {
+      _targetTime = DateTime(
+        pickedDate.year,
+        pickedDate.month,
+        pickedDate.day,
+        pickedTime.hour,
+        pickedTime.minute,
+      );
+      _timeRemaining = _targetTime!.difference(DateTime.now());
+      _startTimer();
+    });
   }
 
   @override
@@ -62,33 +97,49 @@ class _NewYearCountdownState extends State<NewYearCountdown> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             const Text(
-              'Countdown to New Year 🎉',
+              'Countdown Timer ⏳',
               style: TextStyle(
                 fontSize: 24,
                 color: Colors.white,
               ),
             ),
             const SizedBox(height: 20),
-            AnimatedFlipCounter(
-              value: _timeRemaining.inSeconds.toDouble(),
-              duration: const Duration(milliseconds: 800),
-              curve: Curves.easeInOut,
-              fractionDigits: 0,
-              textStyle: const TextStyle(
-                fontSize: 40,
-                color: Colors.yellowAccent,
+            if (_targetTime != null)
+              Column(
+                children: [
+                  AnimatedFlipCounter(
+                    value: _timeRemaining.inSeconds.toDouble(),
+                    duration: const Duration(milliseconds: 800),
+                    curve: Curves.easeInOut,
+                    fractionDigits: 0,
+                    textStyle: const TextStyle(
+                      fontSize: 40,
+                      color: Colors.yellowAccent,
+                    ),
+                  ),
+                  const SizedBox(height: 10),
+                  Text(
+                    _formatDuration(_timeRemaining),
+                    style: const TextStyle(
+                      fontSize: 24,
+                      color: Colors.white,
+                    ),
+                  ),
+                ],
+              )
+            else
+              const Text(
+                textAlign: TextAlign.center,
+                "Select a date and time to start the countdown!",
+                style: TextStyle(fontSize: 18, color: Colors.white70),
               ),
-            ),
-            const SizedBox(height: 10),
-            Text(
-              _formatDuration(_timeRemaining),
-              style: const TextStyle(
-                fontSize: 24,
-                color: Colors.white,
-              ),
-            ),
           ],
         ),
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: _pickDateTime,
+        backgroundColor: Colors.yellowAccent,
+        child: const Icon(Icons.timer, color: Colors.black),
       ),
     );
   }
